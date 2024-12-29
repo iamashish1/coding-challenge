@@ -6,6 +6,7 @@ export const logIn = async (email, password) => {
     try {
         const response = await AxiosService.post("/auth/login", { username: email, password: password, expiresInMins: 1 },
         );
+        //save tokens to async storage
         await AsyncStorage.setItem("accessToken", response.data.accessToken);
         await AsyncStorage.setItem("refreshToken", response.data.refreshToken);
         return response.data;
