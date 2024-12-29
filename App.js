@@ -1,12 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 
-export default function App() {
+import { Provider, useDispatch } from 'react-redux';
+import store from './redux/ReduxStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { loginSuccess, logout } from './redux/AuthSlice';
+import AppNavigator from './AppNavigator';
+
+
+const App = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const checkAuthState = async () => {
+      try {
+        const token = await AsyncStorage.getItem('accessToken');
+        if (token) {
+          dispatch(loginSuccess({ token: token }));
+        }
+      } catch (error) {
+        dispatch(logout());
+      }
+    };
+
+    checkAuthState();
+  }, [dispatch]);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <AppNavigator />
+    </NavigationContainer>
+  );
+};
+
+export default function MainApp() {
+  return (
+    <Provider store={store}>
+      <App />
+    </Provider>
   );
 }
 
